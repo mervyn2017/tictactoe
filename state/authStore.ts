@@ -15,7 +15,7 @@ interface AuthState {
     signOut(): void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>(set => ({
     signedIn: false,
     username: '',
     password: '',

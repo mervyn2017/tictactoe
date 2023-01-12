@@ -1,7 +1,7 @@
 import create from 'zustand';
 import Move from './Move';
 import { checkForWinner } from './checkForWinner';
-import { arrayUpdate, arrayPush, arrayPop } from '../utils';
+import { arrayImmutable } from '../utils';
 
 interface GameState {
     redoStack: Move[];
@@ -47,7 +47,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             return !!winner;
         }
         const playerId = moves.length & 1 ? 1 : 0;
-        const newSquares = arrayUpdate(squares, squareIndex, playerId);
+        const newSquares = arrayImmutable.update(squares, squareIndex, playerId);
         const newWinner = checkForWinner(boardSize, newSquares);
         set(() => ({
             moves: [...moves, new Move(squareIndex, playerId)],
@@ -63,22 +63,22 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (moves.length === 0) {
             return;
         }
-        const [newMoves, lastMove] = arrayPop(moves);
+        const [newMoves, lastMove] = arrayImmutable.pop(moves);
         set(() => ({
             moves: newMoves,
             winner: undefined,
-            squares: arrayUpdate(squares, lastMove.squareIndex, null),
-            redoStack: arrayPush(redoStack, lastMove)
+            squares: arrayImmutable.update(squares, lastMove.squareIndex, null),
+            redoStack: arrayImmutable.push(redoStack, lastMove)
         }));
     },
 
     redoMove() {
         const { redoStack, moves, squares, boardSize } = get();
         if (redoStack.length) {
-            const [newRedoStack, move] = arrayPop(redoStack);
-            const newSquares = arrayUpdate(squares, move.squareIndex, move.playerId);
+            const [newRedoStack, move] = arrayImmutable.pop(redoStack);
+            const newSquares = arrayImmutable.update(squares, move.squareIndex, move.playerId);
             set(() => ({
-                moves: arrayPush(moves, move),
+                moves: arrayImmutable.push(moves, move),
                 winner: checkForWinner(boardSize, newSquares),
                 squares: newSquares,
                 redoStack: newRedoStack

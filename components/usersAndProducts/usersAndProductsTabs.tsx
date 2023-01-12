@@ -7,7 +7,11 @@ const Tab = createMaterialTopTabNavigator();
 
 function UsersAndProductsTabs() {
     return (
-        <Tab.Navigator>
+        <Tab.Navigator
+            screenOptions={{
+                tabBarLabelStyle: { fontSize: 14 },
+                tabBarStyle: { backgroundColor: '#fff' }
+            }}>
             <Tab.Screen name="Users" component={Users} />
             <Tab.Screen name="Products" component={Products} />
         </Tab.Navigator>

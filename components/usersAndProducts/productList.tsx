@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    ActivityIndicator,
+    Image
+} from 'react-native';
 import { Searchbar } from 'react-native-paper';
-import { margin, padding } from '../../utils/cssUtils';
+import { border, margin, padding } from '../../utils/cssUtils';
+import { fetchItems } from '../../utils/http';
 
 type Product = {
     id: number;
@@ -25,37 +35,51 @@ function Product({
     item: Product;
     onPress: () => void | undefined;
 }) {
-    const { title, description, price, brand, category } = item;
+    const { title, description, price, brand, category, thumbnail } = item;
     const backgroundColor = { backgroundColor: isSelected ? '#08b' : '#fff' };
-    const color = { color: isSelected ? '#fff' : '#000', fontSize: 12 };
+    const color = { color: isSelected ? '#fff' : '#000', fontSize: 14 };
+    const image = { uri: thumbnail };
     return (
         <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
             <View style={[styles.itemRow]}>
                 <Text style={[styles.bold, color]}>{title}</Text>
-                <Text style={[color]}>${price}</Text>
+                <Text style={[styles.bold, color]}>${price}</Text>
             </View>
-            <Text style={[color, styles.vspacer]}>{description}</Text>
             <View style={[styles.itemRow, styles.vspacer]}>
                 <Text style={[color]}>Brand: {brand}</Text>
                 <Text style={[color]}>{category}</Text>
+            </View>
+            <View style={[styles.itemRow, styles.vspacer]}>
+                <Text style={[styles.prodDesc, color]}>{description}</Text>
+                <Image style={styles.smallImage} source={image} />
             </View>
         </TouchableOpacity>
     );
 }
 
+async function fetchProducts(): Promise<any> {
+    const json = await fetchItems('https://dummyjson.com/products');
+    if (!json?.products) {
+        throw new Error('Failed to retrieve products');
+    }
+    return json.products;
+}
+
 export function Products() {
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [users, setUsers] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = React.useState('');
     const onChangeSearch = (query: string) => {
         setSearchQuery(query);
     };
 
     useEffect(() => {
-        fetch('https://dummyjson.com/products')
-            .then(res => res.json())
+        fetchProducts()
             .then(json => {
-                setUsers(json.products);
+                setProducts(json);
+            })
+            .catch(err => {
+                console.log(err);
             });
     }, []);
 
@@ -65,25 +89,31 @@ export function Products() {
 
     const filter = searchQuery.toLowerCase();
     const filteredUsers = searchQuery
-        ? users.filter(({ title, brand, category }) =>
+        ? products.filter(({ title, brand, category }) =>
               [title, brand, category].some(s => s?.toLowerCase().includes(filter))
           )
-        : users;
+        : products;
 
     return (
         <SafeAreaView style={styles.container}>
-            <Searchbar
-                placeholder="Search"
-                onChangeText={onChangeSearch}
-                value={searchQuery}
-                style={styles.searchbar}
-            />
-            <FlatList
-                data={filteredUsers}
-                renderItem={renderItem}
-                keyExtractor={item => item.id + ''}
-                extraData={selectedId}
-            />
+            {products.length ? (
+                <>
+                    <Searchbar
+                        placeholder="Search"
+                        onChangeText={onChangeSearch}
+                        value={searchQuery}
+                        style={styles.searchbar}
+                    />
+                    <FlatList
+                        data={filteredUsers}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id + ''}
+                        extraData={selectedId}
+                    />
+                </>
+            ) : (
+                <ActivityIndicator size="large" color="#00f" />
+            )}
         </SafeAreaView>
     );
 }
@@ -91,13 +121,13 @@ export function Products() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#777'
-        // marginTop: 2
+        backgroundColor: '#fff',
+        justifyContent: 'center'
     },
     item: {
         ...padding(4, 8),
         ...margin(3, 5),
-        borderRadius: 5,
+        ...border(1, '#666', 5),
         color: '#000'
     },
     itemRow: {
@@ -115,5 +145,13 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         ...margin(2, 5),
         backgroundColor: '#efe'
+    },
+    prodDesc: {
+        flex: 1,
+        marginRight: 5
+    },
+    smallImage: {
+        width: 100,
+        height: 80
     }
 });
