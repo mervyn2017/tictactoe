@@ -3,63 +3,70 @@ import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from
 import { Searchbar } from 'react-native-paper';
 import { margin, padding } from '../../utils/cssUtils';
 
-type User = {
+type Product = {
     id: number;
-    firstName: string;
-    lastName: string;
-    maidenName: string;
-    age: number;
-    gender: string;
-    email: string;
-    phone: string;
-    username: string;
-    password: string;
-    birthDate: string;
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
 };
 
-function User({ isSelected, item, onPress }: { isSelected: boolean; item: User; onPress: () => void | undefined }) {
-    const { firstName, lastName, age, gender, email, username } = item;
+function Product({
+    isSelected,
+    item,
+    onPress
+}: {
+    isSelected: boolean;
+    item: Product;
+    onPress: () => void | undefined;
+}) {
+    const { title, description, price, brand, category } = item;
     const backgroundColor = { backgroundColor: isSelected ? '#08b' : '#fff' };
     const color = { color: isSelected ? '#fff' : '#000', fontSize: 12 };
     return (
         <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-            <View style={styles.userRow}>
-                <Text style={[styles.bold, color]}>{`${firstName} ${lastName}`}</Text>
-                <Text style={[color]}>{email}</Text>
+            <View style={[styles.itemRow]}>
+                <Text style={[styles.bold, color]}>{title}</Text>
+                <Text style={[color]}>${price}</Text>
             </View>
-            <View style={[styles.userRow, styles.vspacer]}>
-                <Text style={[color]}>Username: {username}</Text>
-                <Text style={[color]}>{`${gender}, ${age}`}</Text>
+            <Text style={[color, styles.vspacer]}>{description}</Text>
+            <View style={[styles.itemRow, styles.vspacer]}>
+                <Text style={[color]}>Brand: {brand}</Text>
+                <Text style={[color]}>{category}</Text>
             </View>
         </TouchableOpacity>
     );
 }
 
-function Users() {
+export function Products() {
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = React.useState('');
     const onChangeSearch = (query: string) => {
         setSearchQuery(query);
     };
 
     useEffect(() => {
-        fetch('https://dummyjson.com/users')
+        fetch('https://dummyjson.com/products')
             .then(res => res.json())
             .then(json => {
-                setUsers(json.users);
+                setUsers(json.products);
             });
     }, []);
 
-    const renderItem = ({ item }: { item: User }) => {
-        return <User isSelected={item.id === selectedId} item={item} onPress={() => setSelectedId(item.id)} />;
+    const renderItem = ({ item }: { item: Product }) => {
+        return <Product isSelected={item.id === selectedId} item={item} onPress={() => setSelectedId(item.id)} />;
     };
 
     const filter = searchQuery.toLowerCase();
     const filteredUsers = searchQuery
-        ? users.filter(
-              ({ firstName, lastName }) =>
-                  firstName.toLowerCase().includes(filter) || lastName.toLowerCase().includes(filter)
+        ? users.filter(({ title, brand, category }) =>
+              [title, brand, category].some(s => s?.toLowerCase().includes(filter))
           )
         : users;
 
@@ -90,10 +97,10 @@ const styles = StyleSheet.create({
     item: {
         ...padding(4, 8),
         ...margin(3, 5),
-        borderRadius: 10,
+        borderRadius: 5,
         color: '#000'
     },
-    userRow: {
+    itemRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         color: 'red'
@@ -105,10 +112,8 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     searchbar: {
-        borderRadius: 10,
+        borderRadius: 5,
         ...margin(2, 5),
-        backgroundColor: '#cfc'
+        backgroundColor: '#efe'
     }
 });
-
-export default Users;
