@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import Move from './Move';
 import { checkForWinner } from './checkForWinner';
 import { arrayImmutable } from '../utils';

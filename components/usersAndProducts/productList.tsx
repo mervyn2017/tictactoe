@@ -69,6 +69,7 @@ export function Products() {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = React.useState('');
+    const [categories, setCategories] = useState(new Set());
     const onChangeSearch = (query: string) => {
         setSearchQuery(query);
     };
@@ -77,6 +78,11 @@ export function Products() {
         fetchProducts()
             .then(json => {
                 setProducts(json);
+                const cats = new Set();
+                json.forEach((prod: Product) => {
+                    cats.add(prod.category);
+                });
+                setCategories(cats);
             })
             .catch(err => {
                 console.log(err);
