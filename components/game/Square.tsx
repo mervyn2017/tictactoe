@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, Pressable } from 'react-native';
-import { border } from '../../utils/cssUtils';
 import { useGameStore } from '../../state/game/gameState';
+import { border } from '../../utils/cssUtils';
 
 const getStyle = (squareIndex: number) => {
     const value = useGameStore.getState().squares[squareIndex];

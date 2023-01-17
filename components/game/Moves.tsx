@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { useGameStore } from '../../state/game/gameState';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function Moves() {
     const moves = useGameStore(state => state.moves);

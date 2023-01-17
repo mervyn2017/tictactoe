@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Actions } from './actions';
 import Board from './board';
 import Moves from './moves';
 import BoardSizeSelector from './boardSizeSelector';
 import Winner from './winner';
-import { Actions } from './actions';
 
 function Spacer() {
     return <View style={styles.spacer} />;

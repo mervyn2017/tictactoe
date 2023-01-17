@@ -12,7 +12,6 @@ const sizeOptions = [
 
 export default function BoardSizeSelector() {
     const [boardSize, setBoardSize] = useGameStore(state => [state.boardSize, state.setBoardSize]);
-
     const [value, setValue] = React.useState(boardSize + '');
 
     const onChangeBoardSize = (val: string) => {

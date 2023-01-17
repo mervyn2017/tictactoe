@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from 'react-native-paper';
 import { StyleSheet, Text, View, GestureResponderEvent } from 'react-native';
+import { Button } from 'react-native-paper';
 import { randomIntegerArray } from '../../utils/statistics';
 import { createDelay } from '../../utils/delay';
-import { padding } from '../../utils/cssUtils';
 import { useGameStore } from '../../state/game/gameState';
+import { padding } from '../../utils/cssUtils';
 
 const reset = () => {
     useGameStore.getState().initialize();

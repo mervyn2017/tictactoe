@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { border, padding } from '../../utils/cssUtils';
-import { useGameStore } from '../../state/game/gameState';
 import { shallow } from 'zustand/shallow';
+import { useGameStore } from '../../state/game/gameState';
 
 export default function Winner() {
     const winner = useGameStore(state => state.winner, shallow);

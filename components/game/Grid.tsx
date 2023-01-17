@@ -14,6 +14,7 @@ export function Grid({
 }) {
     const arr = [...Array(size)];
     let index = 0;
+
     return (
         <View>
             {arr.map((e, rowIndex) => (
