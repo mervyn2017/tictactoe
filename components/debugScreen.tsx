@@ -3,11 +3,7 @@ import { ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native
 
 import { Colors, DebugInstructions, ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
 
-const Section: React.FC<
-    PropsWithChildren<{
-        title: string;
-    }>
-> = ({ children, title }) => {
+function Section({ children, title }: PropsWithChildren<{ title: string }>) {
     const isDarkMode = useColorScheme() === 'dark';
     return (
         <View style={styles.sectionContainer}>
@@ -31,7 +27,7 @@ const Section: React.FC<
             </Text>
         </View>
     );
-};
+}
 
 export function DebugScreen() {
     const isDarkMode = useColorScheme() === 'dark';

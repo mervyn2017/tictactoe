@@ -18,7 +18,7 @@ import {
     NativeStackNavigationOptions,
     NativeStackNavigationProp
 } from '@react-navigation/native-stack';
-import Game from './components/game/Game';
+import Game from './components/game/game';
 import Users from './components/usersAndProducts/usersAndProductsTabs';
 import { DebugScreen } from './components/debugScreen';
 import { SignInScreen } from './components/login/signInScreen';

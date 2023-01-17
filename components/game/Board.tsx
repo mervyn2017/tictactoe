@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import Square from './Square';
+import Square from './square';
 import { StyleSheet, View } from 'react-native';
 import { border } from '../../utils/cssUtils';
-import { Grid } from './Grid';
+import { Grid } from './grid';
 import { useGameStore } from '../../state/game/gameState';
 
 export default function Board() {
