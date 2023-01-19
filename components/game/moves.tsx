@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useGameStore } from '../../state/game/gameState';
+import { shallow } from 'zustand/shallow';
 
 export default function Moves() {
-    const moves = useGameStore(state => state.moves);
+    const moves = useGameStore(state => state.moves, shallow);
 
     return (
         <View style={styles.container}>

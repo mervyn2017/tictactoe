@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, Pressable } from 'react-native';
 import { useGameStore } from '../../state/game/gameState';
 import { border } from '../../utils/cssUtils';
+import { shallow } from 'zustand/shallow';
 
-const getStyle = (squareIndex: number) => {
-    const value = useGameStore.getState().squares[squareIndex];
+const getStyle = (value: number | null) => {
     switch (value) {
         case 0:
             return styles.nought;
@@ -18,9 +18,9 @@ const getStyle = (squareIndex: number) => {
 export default function Square(props: { squareIndex: number }) {
     const { squareIndex } = props;
     const [style, setStyle] = useState(getStyle(squareIndex));
-    const [squares, executeMove] = useGameStore(state => [state.squares, state.executeMove]);
+    const [value, executeMove] = useGameStore(state => [state.squares[squareIndex], state.executeMove], shallow);
 
-    useEffect(() => setStyle(getStyle(squareIndex)), [squares, squareIndex]);
+    useEffect(() => setStyle(getStyle(value)), [value, squareIndex]);
 
     return (
         <Pressable onPressIn={() => executeMove(squareIndex)} style={[style, styles.gridCell]}>

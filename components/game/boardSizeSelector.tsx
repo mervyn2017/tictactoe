@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useGameStore } from '../../state/game/gameState';
+import { shallow } from 'zustand/shallow';
 
 const sizeOptions = [
     { label: '3 x 3', value: '3' },
@@ -11,8 +12,8 @@ const sizeOptions = [
 ];
 
 export default function BoardSizeSelector() {
-    const [boardSize, setBoardSize] = useGameStore(state => [state.boardSize, state.setBoardSize]);
-    const [value, setValue] = React.useState(boardSize + '');
+    const [boardSize, setBoardSize] = useGameStore(state => [state.boardSize, state.setBoardSize], shallow);
+    const [value, setValue] = useState(boardSize + '');
 
     const onChangeBoardSize = (val: string) => {
         setBoardSize(+val);

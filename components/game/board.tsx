@@ -4,9 +4,10 @@ import Square from './square';
 import { border } from '../../utils/cssUtils';
 import { Grid } from './grid';
 import { useGameStore } from '../../state/game/gameState';
+import { shallow } from 'zustand/shallow';
 
 export default function Board() {
-    const [boardSize, initialize] = useGameStore(state => [state.boardSize, state.initialize]);
+    const [boardSize, initialize] = useGameStore(state => [state.boardSize, state.initialize], shallow);
 
     useEffect(() => {
         initialize();
