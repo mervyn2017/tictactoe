@@ -43,8 +43,8 @@ export function Actions() {
     const difficulty = useGameStore(state => state.difficulty);
     const setDifficulty = useGameStore(state => state.setDifficulty);
 
-    const twoPlayerGame = useGameStore(state => state.twoPlayerGame);
-    const setTwoPlayerGame = useGameStore(state => state.setTwoPlayerGame);
+    const playComputer = useGameStore(state => state.playComputer);
+    const setPlayComputer = useGameStore(state => state.setPlayComputer);
 
     const [cancelSimulation, setCancelSimulation] = useState(() => () => {});
 
@@ -81,9 +81,9 @@ export function Actions() {
         });
     };
 
-    const setNumberOfPlayers = (val: number) => {
+    const setPlayAgainstComputer = (val: boolean) => {
         cancelSimulation();
-        setTwoPlayerGame(val === 2);
+        setPlayComputer(val);
     };
 
     useEffect(() => {
@@ -107,21 +107,24 @@ export function Actions() {
             </View>
             <View style={[styles.container, styles.switchContainer]}>
                 <SwitchWithText
-                    inactiveText="One Player"
-                    activeText="Two Player"
-                    value={twoPlayerGame}
-                    onChange={val => setNumberOfPlayers(val ? 2 : 1)}
+                    style={{ flex: 3 }}
+                    inactiveText="Two Players"
+                    activeText="Play Computer"
+                    value={playComputer}
+                    onChange={val => setPlayAgainstComputer(val)}
                 />
-                <View style={{ width: 30 }}></View>
-                <SwitchWithText
-                    inactiveText="Easy"
-                    activeText="Difficult"
-                    value={difficulty !== Difficulty.Easy}
-                    onChange={val => {
-                        cancelSimulation();
-                        setDifficulty(val ? Difficulty.Difficult : Difficulty.Easy);
-                    }}
-                />
+                {playComputer ? (
+                    <SwitchWithText
+                        style={{ flex: 2 }}
+                        inactiveText="Easy"
+                        activeText="Difficult"
+                        value={difficulty !== Difficulty.Easy}
+                        onChange={val => {
+                            cancelSimulation();
+                            setDifficulty(val ? Difficulty.Difficult : Difficulty.Easy);
+                        }}
+                    />
+                ) : null}
             </View>
         </View>
     );

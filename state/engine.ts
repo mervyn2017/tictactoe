@@ -1,6 +1,7 @@
 import { useGameStore } from './game';
 import { getWinningCombinations } from './checkForWinner';
 import { shuffle } from '../utils/statistics';
+import { PlayerId } from './constants';
 
 /**
  * Returns the index of the square of the next move for the given player
@@ -18,72 +19,55 @@ export function getPlayerTwoMoveRandom(): number {
     return nullSquares[r];
 }
 
-// function getNextMove(boardSize: number, squares: (1 | 2 | null)[], playerId: number) {
-//     // console.log('getNextMove', playerId, squares);
-//     let bestScore = -1000;
-//     let bestMove: number;
-//     for (let i = 0; i < squares.length; ++i) {
-//         if (squares[i] === null) {
-//             squares[i] = playerId;
-//             const winner = checkForWinner(boardSize, squares);
-//             if (winner) {
-//                 const score = playerId === 0 ? 1 : -1;
-//                 if (score > bestScore) {
-//                     bestScore = score;
-//                     bestMove = i;
-//                 }
-//                 squares[i] = null;
-//                 continue;
-//             } else {
-//                 const score = getNextMove(boardSize, squares, playerId === 0 ? 1 : 0);
-//                 squares[i] = null;
-//                 if (score > bestScore) {
-//                     bestScore = score;
-//                     bestMove = i;
-//                 }
-//             }
-//         }
-//     }
-//     return bestMove;
-// }
-
-// A simple algorithm that blocks a winning combination from the other
-// player and picks a winning square when possible.
+// A simple algorithm that blocks a winning combination from the other player and picks
+// a winning square when possible. Priority is given to a winning combo over blocking
+// a losing combo when both are available.
 function simpleAlgo(boardSize: number, squares: (number | null)[]) {
     const winningCombos = getWinningCombinations(boardSize);
+    // look for any combination which has (boardSize-1) of the same player
+    let losingSquare: number | undefined;
     for (const combo of winningCombos) {
-        const counts = [0, 0];
+        const counts = {
+            [PlayerId.One]: 0,
+            [PlayerId.Two]: 0
+        };
         for (let i = 0; i < boardSize; ++i) {
             const squareValue = squares[combo[i]];
             if (squareValue !== null) {
                 counts[squareValue]++;
             }
         }
-        if (counts.some(count => count === boardSize - 1)) {
+        if (counts[PlayerId.Two] === boardSize - 1) {
             const index = combo.findIndex(squareIndex => squares[squareIndex] === null);
             if (index >= 0) {
+                // if a winning square is found, return it immediately
                 return combo[index];
             }
         }
+        if (counts[PlayerId.One] === boardSize - 1) {
+            const index = combo.findIndex(squareIndex => squares[squareIndex] === null);
+            if (index >= 0) {
+                losingSquare = combo[index];
+            }
+        }
     }
-    return getPlayerTwoMoveRandom();
+    return losingSquare !== undefined ? losingSquare : getPlayerTwoMoveRandom();
 }
 
 export function getPlayerTwoMoveOptimal(): number {
     const state = useGameStore.getState();
     const { squares, boardSize, moves } = state;
-    const playerId = moves.length & 1 ? 1 : 0;
-    if (playerId === 0) {
-        throw new Error('cant be player 0');
+    const playerId = moves.length & 1 ? PlayerId.Two : PlayerId.One;
+    if (playerId === PlayerId.One) {
+        throw new Error('Cant be player 1!');
     }
     if (boardSize === 3) {
-        // const nextMove = getNextMove(boardSize, squares.slice(), playerId);
-        // return nextMove;
-
         if (moves.length === 1) {
+            // select the center square if it's available
             if (squares[4] === null) {
                 return 4;
             } else {
+                // randomly select any of the 4 corner squares
                 const cornerIndices = [0, 2, 6, 8];
                 for (let i of shuffle(cornerIndices)) {
                     if (squares[i] === null) {

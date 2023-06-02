@@ -4,15 +4,17 @@ export function SwitchWithText({
     value,
     onChange,
     activeText,
-    inactiveText
+    inactiveText,
+    style = {}
 }: {
     value: boolean;
     onChange: (value: boolean) => void;
     activeText: string;
     inactiveText: string;
+    style?: {};
 }) {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, style]}>
             <Switch
                 trackColor={{ false: '#fff', true: '#fff' }}
                 thumbColor={value ? '#06f' : '#090'}
@@ -21,7 +23,9 @@ export function SwitchWithText({
                 value={value}
             />
             <View style={styles.textContainer}>
-                <Text style={styles.text}>{value ? activeText : inactiveText}</Text>
+                <Text numberOfLines={1} style={styles.text}>
+                    {value ? activeText : inactiveText}
+                </Text>
             </View>
         </View>
     );

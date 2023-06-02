@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SafeAreaView, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useGameStore } from '../state/game';

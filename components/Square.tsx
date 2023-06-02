@@ -9,7 +9,7 @@ import * as Haptics from 'expo-haptics';
 
 export default function Square(props: { squareIndex: number }) {
     const { squareIndex } = props;
-    const twoPlayerGame = useGameStore(state => state.twoPlayerGame);
+    const playComputer = useGameStore(state => state.playComputer);
     const gameOver = useGameStore(state => state.gameOver);
     const [value, executeMove] = useGameStore(state => [state.squares[squareIndex], state.executeMove], shallow);
     const difficulty = useGameStore(state => state.difficulty);
@@ -20,7 +20,7 @@ export default function Square(props: { squareIndex: number }) {
         }
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         const hasWinner = executeMove(squareIndex);
-        if (!hasWinner && !twoPlayerGame) {
+        if (!hasWinner && playComputer) {
             if (difficulty === Difficulty.Easy) {
                 executeMove(getPlayerTwoMoveRandom());
             } else {

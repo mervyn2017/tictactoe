@@ -10,7 +10,7 @@ export enum Difficulty {
 }
 
 interface GameState {
-    twoPlayerGame: boolean;
+    playComputer: boolean;
     difficulty: Difficulty;
     redoStack: Move[];
     boardSize: number;
@@ -19,7 +19,7 @@ interface GameState {
     moves: Move[];
     gameOver: boolean;
 
-    setTwoPlayerGame(twoPlayerGame: boolean): void;
+    setPlayComputer(playComputer: boolean): void;
     setDifficulty(difficulty: Difficulty): void;
     reset(): void;
     setBoardSize(boardSize: number): void;
@@ -30,7 +30,7 @@ interface GameState {
 }
 
 const getDefaults = (boardSize: number) => ({
-    twoPlayerGame: false,
+    playComputer: true,
     difficulty: Difficulty.Easy,
     redoStack: [],
     boardSize,
@@ -43,36 +43,41 @@ const getDefaults = (boardSize: number) => ({
 export const useGameStore = create<GameState>((set, get) => ({
     ...getDefaults(3),
 
-    setTwoPlayerGame: (twoPlayerGame: boolean) => {
+    setPlayComputer: (playComputer: boolean) => {
         const { boardSize, difficulty } = get();
         set(() => ({
             ...getDefaults(boardSize),
-            twoPlayerGame,
+            playComputer,
             difficulty
         }));
     },
 
     setDifficulty: (difficulty: Difficulty) => {
-        const { boardSize, twoPlayerGame } = get();
+        const { boardSize, playComputer } = get();
         set(() => ({
             ...getDefaults(boardSize),
-            twoPlayerGame,
+            playComputer,
             difficulty
         }));
     },
 
     reset: () => {
-        const { boardSize, twoPlayerGame, difficulty } = get();
+        const { boardSize, playComputer, difficulty } = get();
         set(() => ({
             ...getDefaults(boardSize),
-            twoPlayerGame,
+            playComputer,
             difficulty
         }));
     },
 
     setBoardSize: (boardSize: number) => {
+        const { playComputer, difficulty } = get();
         if (boardSize !== get().boardSize) {
-            set(() => getDefaults(boardSize));
+            set(() => ({
+                ...getDefaults(boardSize),
+                playComputer,
+                difficulty
+            }));
         }
     },
 
