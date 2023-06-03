@@ -4,30 +4,33 @@ import { Button } from 'react-native-paper';
 import { randomIntegerArray } from '../utils/statistics';
 import { createDelay } from '../utils/delay';
 import { useGameStore, Difficulty } from '../state/game';
-import { padding } from '../utils/cssUtils';
 import { SwitchWithText } from './SwitchWithText';
+import * as Haptics from 'expo-haptics';
 
-function ActionButton({
-    onPress,
-    children,
-    disabled
-}: {
+type ActionButtonProps = {
     onPress: (e: GestureResponderEvent) => void;
     children: any;
-    disabled?: boolean;
-}) {
+};
+
+function ActionButton({ onPress, children }: ActionButtonProps) {
+    const pressed = (e: GestureResponderEvent) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress(e);
+    };
+
     return (
-        <Button
-            style={styles.button}
-            compact
-            mode="elevated"
-            onPress={onPress}
-            disabled={disabled}
-            textColor="#000"
-            buttonColor="#fff">
+        <Button style={styles.button} compact mode="elevated" onPress={pressed} textColor="#000" buttonColor="#fff">
             <Text style={styles.buttonText}>{children}</Text>
         </Button>
     );
+}
+
+function InvisibleBtn() {
+    return <View style={styles.button}></View>;
+}
+
+function Spacer() {
+    return <View style={styles.spacer}></View>;
 }
 
 export function Actions() {
@@ -48,7 +51,7 @@ export function Actions() {
 
     const [cancelSimulation, setCancelSimulation] = useState(() => () => {});
 
-    const resetGame = () => {
+    const startGame = () => {
         cancelSimulation();
         reset();
     };
@@ -66,7 +69,8 @@ export function Actions() {
     const runDemo = () => {
         cancelSimulation();
         setCancelSimulation(() => {
-            resetGame();
+            // starts the simulation and returns the cancel function
+            reset();
             const randomArray = randomIntegerArray(numSquares);
             let cancel = false;
             (async () => {
@@ -96,14 +100,13 @@ export function Actions() {
     return (
         <View>
             <View style={styles.container}>
-                <ActionButton onPress={resetGame}>Play</ActionButton>
+                <ActionButton onPress={startGame}>Play</ActionButton>
+                <Spacer />
                 <ActionButton onPress={runDemo}>Demo</ActionButton>
-                <ActionButton onPress={undo} disabled={undoDisabled}>
-                    Undo
-                </ActionButton>
-                <ActionButton onPress={redo} disabled={redoDisabled}>
-                    Redo
-                </ActionButton>
+                <Spacer />
+                {undoDisabled ? <InvisibleBtn /> : <ActionButton onPress={undo}>Undo</ActionButton>}
+                <Spacer />
+                {redoDisabled ? <InvisibleBtn /> : <ActionButton onPress={redo}>Redo</ActionButton>}
             </View>
             <View style={[styles.container, styles.switchContainer]}>
                 <SwitchWithText
@@ -139,10 +142,13 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     button: {
-        marginRight: 10,
-        ...padding(0, 4)
+        flex: 1
+    },
+    spacer: {
+        flex: 0.1
     },
     buttonText: {
-        fontSize: 16
+        fontSize: 16,
+        color: '#000'
     }
 });

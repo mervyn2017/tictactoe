@@ -1,4 +1,5 @@
-import { Platform, StyleSheet, View, Text, Switch } from 'react-native';
+import { Platform, StyleSheet, View, Text, Switch, Pressable } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 export function SwitchWithText({
     value,
@@ -13,20 +14,25 @@ export function SwitchWithText({
     inactiveText: string;
     style?: {};
 }) {
+    const toggle = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onChange(!value);
+    };
+
     return (
         <View style={[styles.container, style]}>
             <Switch
                 trackColor={{ false: '#fff', true: '#fff' }}
                 thumbColor={value ? '#06f' : '#090'}
                 ios_backgroundColor="#fff"
-                onValueChange={() => onChange(!value)}
+                onValueChange={toggle}
                 value={value}
             />
-            <View style={styles.textContainer}>
+            <Pressable style={styles.textContainer} onPress={toggle}>
                 <Text numberOfLines={1} style={styles.text}>
                     {value ? activeText : inactiveText}
                 </Text>
-            </View>
+            </Pressable>
         </View>
     );
 }
