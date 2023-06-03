@@ -22,10 +22,11 @@ export function getPlayerTwoMoveRandom(): number {
 // A simple algorithm that blocks a winning combination from the other player and picks
 // a winning square when possible. Priority is given to a winning combo over blocking
 // a losing combo when both are available.
-function simpleAlgo(boardSize: number, squares: (number | null)[]) {
+function simpleAlgo(boardSize: number, squares: (number | null)[], playerToMove: PlayerId) {
     const winningCombos = getWinningCombinations(boardSize);
     // look for any combination which has (boardSize-1) of the same player
-    let losingSquare: number | undefined;
+    const opposingPlayer = playerToMove === PlayerId.One ? PlayerId.Two : PlayerId.One;
+    let opponentWinningSquare: number | undefined;
     for (const combo of winningCombos) {
         const counts = {
             [PlayerId.One]: 0,
@@ -37,30 +38,27 @@ function simpleAlgo(boardSize: number, squares: (number | null)[]) {
                 counts[squareValue]++;
             }
         }
-        if (counts[PlayerId.Two] === boardSize - 1) {
+        if (counts[playerToMove] === boardSize - 1) {
             const index = combo.findIndex(squareIndex => squares[squareIndex] === null);
             if (index >= 0) {
                 // if a winning square is found, return it immediately
                 return combo[index];
             }
         }
-        if (counts[PlayerId.One] === boardSize - 1) {
+        if (counts[opposingPlayer] === boardSize - 1) {
             const index = combo.findIndex(squareIndex => squares[squareIndex] === null);
             if (index >= 0) {
-                losingSquare = combo[index];
+                opponentWinningSquare = combo[index];
             }
         }
     }
-    return losingSquare !== undefined ? losingSquare : getPlayerTwoMoveRandom();
+    return opponentWinningSquare !== undefined ? opponentWinningSquare : getPlayerTwoMoveRandom();
 }
 
 export function getPlayerTwoMoveOptimal(): number {
     const state = useGameStore.getState();
     const { squares, boardSize, moves } = state;
-    const playerId = moves.length & 1 ? PlayerId.Two : PlayerId.One;
-    if (playerId === PlayerId.One) {
-        throw new Error('Cant be player 1!');
-    }
+    const playerToMove = moves.length & 1 ? PlayerId.Two : PlayerId.One;
     if (boardSize === 3) {
         if (moves.length === 1) {
             // select the center square if it's available
@@ -76,9 +74,9 @@ export function getPlayerTwoMoveOptimal(): number {
                 }
             }
         } else {
-            return simpleAlgo(boardSize, squares);
+            return simpleAlgo(boardSize, squares, playerToMove);
         }
     } else {
-        return simpleAlgo(boardSize, squares);
+        return simpleAlgo(boardSize, squares, playerToMove);
     }
 }
