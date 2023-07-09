@@ -56,7 +56,6 @@ class ComboCache {
     getWinningCombos(boardSize: number): number[][] {
         let combos = this.cache.get(boardSize);
         if (!combos) {
-            console.log('get winning combos for board size', boardSize);
             combos = getWinningCombos(boardSize);
             this.cache.set(boardSize, combos);
         }

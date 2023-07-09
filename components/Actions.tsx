@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, GestureResponderEvent } from 'react-native';
-import { Button } from 'react-native-paper';
+import { StyleSheet, Text, View, GestureResponderEvent, SafeAreaView } from 'react-native';
+import { Button, SegmentedButtons } from 'react-native-paper';
 import { randomIntegerArray } from '../utils/statistics';
 import { createDelay } from '../utils/delay';
 import { useGameStore, Difficulty } from '../state/game';
-import { SwitchWithText } from './SwitchWithText';
 import * as Haptics from 'expo-haptics';
+
+const PlayOptions = [
+    { label: 'Play Computer', value: '1', checkedColor: '#00ff44', uncheckedColor: '#999' },
+    { label: 'Two Player', value: '0', checkedColor: '#00ff44', uncheckedColor: '#999' }
+];
+
+const DifficultyOptions = [
+    { label: 'Easy', value: Difficulty.Easy, checkedColor: '#00ff44', uncheckedColor: '#999' },
+    { label: 'Medium', value: Difficulty.Medium, checkedColor: '#00ff44', uncheckedColor: '#999' },
+    { label: 'Difficult', value: Difficulty.Difficult, checkedColor: '#00ff44', uncheckedColor: '#999' }
+];
 
 type ActionButtonProps = {
     onPress: (e: GestureResponderEvent) => void;
@@ -19,7 +29,7 @@ function ActionButton({ onPress, children }: ActionButtonProps) {
     };
 
     return (
-        <Button style={styles.button} compact mode="elevated" onPress={pressed} textColor="#000" buttonColor="#fff">
+        <Button style={styles.button} compact mode="outlined" onPress={pressed} buttonColor="#ddd">
             <Text style={styles.buttonText}>{children}</Text>
         </Button>
     );
@@ -86,6 +96,7 @@ export function Actions() {
     };
 
     const setPlayAgainstComputer = (val: boolean) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         cancelSimulation();
         setPlayComputer(val);
     };
@@ -98,38 +109,39 @@ export function Actions() {
     const undoDisabled = moves.length === 0;
 
     return (
-        <View>
-            <View style={styles.container}>
-                <ActionButton onPress={startGame}>Play</ActionButton>
-                <Spacer />
-                <ActionButton onPress={runDemo}>Demo</ActionButton>
+        <SafeAreaView>
+            <View>
+                <SegmentedButtons
+                    value={playComputer ? '1' : '0'}
+                    onValueChange={val => setPlayAgainstComputer(val === '1' ? true : false)}
+                    buttons={PlayOptions}
+                    density="small"
+                    theme={{ colors: { secondaryContainer: '#000' } }}
+                />
+            </View>
+            {playComputer ? (
+                <View style={[styles.container, styles.switchContainer]}>
+                    <SegmentedButtons
+                        value={difficulty}
+                        onValueChange={val => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            cancelSimulation();
+                            setDifficulty(val);
+                        }}
+                        buttons={DifficultyOptions}
+                        density="small"
+                        theme={{ colors: { secondaryContainer: '#000' } }}
+                    />
+                </View>
+            ) : null}
+            <View style={[styles.container, styles.switchContainer]}>
+                <ActionButton onPress={startGame}>Reset</ActionButton>
                 <Spacer />
                 {undoDisabled ? <InvisibleBtn /> : <ActionButton onPress={undo}>Undo</ActionButton>}
                 <Spacer />
                 {redoDisabled ? <InvisibleBtn /> : <ActionButton onPress={redo}>Redo</ActionButton>}
             </View>
-            <View style={[styles.container, styles.switchContainer]}>
-                <SwitchWithText
-                    style={{ flex: 3 }}
-                    inactiveText="Two Players"
-                    activeText="Play Computer"
-                    value={playComputer}
-                    onChange={val => setPlayAgainstComputer(val)}
-                />
-                {playComputer ? (
-                    <SwitchWithText
-                        style={{ flex: 2 }}
-                        inactiveText="Easy"
-                        activeText="Difficult"
-                        value={difficulty !== Difficulty.Easy}
-                        onChange={val => {
-                            cancelSimulation();
-                            setDifficulty(val ? Difficulty.Difficult : Difficulty.Easy);
-                        }}
-                    />
-                ) : null}
-            </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -142,10 +154,11 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     button: {
-        flex: 1
+        flex: 1,
+        borderColor: '#000'
     },
     spacer: {
-        flex: 0.1
+        flex: 0.2
     },
     buttonText: {
         fontSize: 16,

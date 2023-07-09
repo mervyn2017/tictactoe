@@ -17,17 +17,19 @@ export default function Board() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.board}>
-                <Grid size={boardSize} getElement={getElement} />
-            </View>
             <View style={styles.winnerContainer}>
-                {winner && (
+                {winner ? (
                     <>
                         <Text style={styles.winner}>Winner:</Text>
+                        <View style={{ width: 10 }} />
                         <Text style={[styles.winner, { color: playerColors[winner] }]}>{`Player ${winner}`}</Text>
                     </>
+                ) : (
+                    <Text style={styles.winner}>{isDraw ? 'Draw!' : 'Winner: ?'}</Text>
                 )}
-                {isDraw && <Text style={styles.winner}>Draw!</Text>}
+            </View>
+            <View style={styles.board}>
+                <Grid size={boardSize} getElement={getElement} />
             </View>
         </View>
     );
@@ -35,20 +37,21 @@ export default function Board() {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row'
+        flexDirection: 'column',
+        // justifyContent: 'center',
+        alignItems: 'center'
     },
     board: {
         ...border(4, '#999', 20),
         padding: 2,
-        backgroundColor: '#fff',
-        alignSelf: 'flex-start'
+        backgroundColor: '#fff'
     },
     winnerContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
+        flexDirection: 'row',
+        marginBottom: 20
     },
     winner: {
+        fontStyle: 'italic',
         fontSize: 20,
         fontWeight: 'bold',
         color: 'yellow'

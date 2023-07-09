@@ -7,37 +7,30 @@ export default function Moves() {
     const moves = useGameStore(state => state.moves);
 
     return (
-        <View>
-            <View style={styles.moves}>
-                {moves.map(({ squareIndex, playerId }: { squareIndex: number; playerId: number }, i: number) => (
-                    <View key={i} style={[styles.circle, { backgroundColor: playerColors[playerId] }]}>
-                        <Text style={styles.text}>{squareIndex}</Text>
-                    </View>
-                ))}
-            </View>
+        <View style={styles.moves}>
+            {moves.map(({ squareIndex, playerId }: { squareIndex: number; playerId: number }, i: number) => (
+                <View key={i} style={[styles.move, { backgroundColor: playerColors[playerId] }]}>
+                    <Text style={styles.text}>{squareIndex}</Text>
+                </View>
+            ))}
         </View>
     );
 }
 
-const radius = 35;
+const radius = 30;
 
 const styles = StyleSheet.create({
-    label: {
-        marginBottom: 5,
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: '#fff'
-    },
     moves: {
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
-    circle: {
+    move: {
         height: radius,
         width: radius,
         borderRadius: 8,
-        margin: 1,
-        borderWidth: 2,
+        margin: 2,
+        borderWidth: 1,
+        borderColor: '#999',
         alignItems: 'center',
         justifyContent: 'center'
     },

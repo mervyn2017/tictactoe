@@ -1,11 +1,11 @@
 import React from 'react';
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { useGameStore } from '../state/game';
 import * as Haptics from 'expo-haptics';
 
-const checkedColor = 'black';
-const uncheckedColor = 'white';
+const checkedColor = '#00ff44';
+const uncheckedColor = '#999';
 
 const sizeOptions = [
     { label: '3 x 3', value: '3', checkedColor, uncheckedColor },
@@ -23,20 +23,14 @@ export default function BoardSizeSelector() {
     };
 
     return (
-        <View>
-            <SafeAreaView>
-                <SegmentedButtons
-                    value={`${boardSize}`}
-                    onValueChange={boardSizeSelected}
-                    buttons={sizeOptions}
-                    density="regular"
-                    theme={{
-                        colors: {
-                            secondaryContainer: 'cyan'
-                        }
-                    }}
-                />
-            </SafeAreaView>
-        </View>
+        <SafeAreaView>
+            <SegmentedButtons
+                value={`${boardSize}`}
+                onValueChange={boardSizeSelected}
+                buttons={sizeOptions}
+                density="regular"
+                theme={{ colors: { secondaryContainer: '#000' } }}
+            />
+        </SafeAreaView>
     );
 }

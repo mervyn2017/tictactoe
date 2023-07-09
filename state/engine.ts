@@ -1,13 +1,14 @@
-import { useGameStore } from './game';
+import { useGameStore, Difficulty } from './game';
 import { getWinningCombinations } from './checkForWinner';
 import { shuffle } from '../utils/statistics';
 import { PlayerId } from './constants';
+import { getOptimalMove } from './optimalEngine';
 
 /**
  * Returns the index of the square of the next move for the given player
  * @param squares
  */
-export function getPlayerTwoMoveRandom(): number {
+function getRandomMove(): number {
     const squares = useGameStore.getState().squares;
     const nullSquares = [];
     squares.forEach((square, index) => {
@@ -22,7 +23,7 @@ export function getPlayerTwoMoveRandom(): number {
 // A simple algorithm that blocks a winning combination from the other player and picks
 // a winning square when possible. Priority is given to a winning combo over blocking
 // a losing combo when both are available.
-function simpleAlgo(boardSize: number, squares: (number | null)[], playerToMove: PlayerId) {
+function getBestMoveLookingOneMoveAhead(boardSize: number, squares: (number | null)[], playerToMove: PlayerId) {
     const winningCombos = getWinningCombinations(boardSize);
     // look for any combination which has (boardSize-1) of the same player
     const opposingPlayer = playerToMove === PlayerId.One ? PlayerId.Two : PlayerId.One;
@@ -52,31 +53,45 @@ function simpleAlgo(boardSize: number, squares: (number | null)[], playerToMove:
             }
         }
     }
-    return opponentWinningSquare !== undefined ? opponentWinningSquare : getPlayerTwoMoveRandom();
+    return opponentWinningSquare !== undefined ? opponentWinningSquare : getRandomMove();
 }
 
-export function getPlayerTwoMoveOptimal(): number {
-    const state = useGameStore.getState();
-    const { squares, boardSize, moves } = state;
+// export function getBestMoveLookingOneMoveAhead(): number {
+//     const { squares, boardSize, moves } = useGameStore.getState();
+//     const playerToMove = moves.length & 1 ? PlayerId.Two : PlayerId.One;
+// if (boardSize === 3) {
+//     if (moves.length === 1) {
+//         // select the center square if it's available
+//         if (squares[4] === null) {
+//             return 4;
+//         } else {
+//             // randomly select any of the 4 corner squares
+//             const cornerIndices = [0, 2, 6, 8];
+//             for (let i of shuffle(cornerIndices)) {
+//                 if (squares[i] === null) {
+//                     return i;
+//                 }
+//             }
+//         }
+//     } else {
+//         return simpleAlgo(boardSize, squares, playerToMove);
+//     }
+// } else {
+// return simpleAlgo(boardSize, squares, playerToMove);
+// }
+// }
+
+export function calculateNextMove(): number {
+    const { squares, boardSize, moves, difficulty } = useGameStore.getState();
     const playerToMove = moves.length & 1 ? PlayerId.Two : PlayerId.One;
-    if (boardSize === 3) {
-        if (moves.length === 1) {
-            // select the center square if it's available
-            if (squares[4] === null) {
-                return 4;
-            } else {
-                // randomly select any of the 4 corner squares
-                const cornerIndices = [0, 2, 6, 8];
-                for (let i of shuffle(cornerIndices)) {
-                    if (squares[i] === null) {
-                        return i;
-                    }
-                }
-            }
-        } else {
-            return simpleAlgo(boardSize, squares, playerToMove);
-        }
-    } else {
-        return simpleAlgo(boardSize, squares, playerToMove);
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return getRandomMove();
+        case Difficulty.Medium:
+            return getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
+        case Difficulty.Difficult:
+            return boardSize === 3
+                ? getOptimalMove()
+                : getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
     }
 }

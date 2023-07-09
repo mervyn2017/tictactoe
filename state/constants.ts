@@ -4,6 +4,6 @@ export enum PlayerId {
 }
 
 export const playerColors = {
-    [PlayerId.One]: '#4444ff',
+    [PlayerId.One]: '#44f',
     [PlayerId.Two]: '#f00'
 };

@@ -30,6 +30,6 @@ const styles = StyleSheet.create({
         paddingRight: 5
     },
     spacer: {
-        height: 20
+        height: 15
     }
 });

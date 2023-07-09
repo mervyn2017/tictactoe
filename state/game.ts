@@ -5,8 +5,9 @@ import { produce } from 'immer';
 import { PlayerId } from './constants';
 
 export enum Difficulty {
-    Easy,
-    Difficult
+    Easy = 'EASY',
+    Medium = 'MEDIUM',
+    Difficult = 'DIFFICULT'
 }
 
 interface GameState {
@@ -31,7 +32,7 @@ interface GameState {
 
 const getDefaults = (boardSize: number) => ({
     playComputer: true,
-    difficulty: Difficulty.Easy,
+    difficulty: Difficulty.Medium,
     redoStack: [],
     boardSize,
     squares: Array(boardSize ** 2).fill(null),
@@ -43,7 +44,7 @@ const getDefaults = (boardSize: number) => ({
 export const useGameStore = create<GameState>((set, get) => ({
     ...getDefaults(3),
 
-    setPlayComputer: (playComputer: boolean) => {
+    setPlayComputer(playComputer: boolean) {
         const { boardSize, difficulty } = get();
         set(() => ({
             ...getDefaults(boardSize),
@@ -52,7 +53,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
     },
 
-    setDifficulty: (difficulty: Difficulty) => {
+    setDifficulty(difficulty: Difficulty) {
         const { boardSize, playComputer } = get();
         set(() => ({
             ...getDefaults(boardSize),
@@ -61,7 +62,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
     },
 
-    reset: () => {
+    reset() {
         const { boardSize, playComputer, difficulty } = get();
         set(() => ({
             ...getDefaults(boardSize),
@@ -70,7 +71,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
     },
 
-    setBoardSize: (boardSize: number) => {
+    setBoardSize(boardSize: number) {
         const { playComputer, difficulty } = get();
         if (boardSize !== get().boardSize) {
             set(() => ({
