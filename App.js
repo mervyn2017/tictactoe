@@ -19,14 +19,7 @@ const theme = {
 
 export default function App() {
     useEffect(() => {
-        const backAction = () => {
-            Alert.alert('Tic Tac Toe', 'Are you sure you want to exit?', [
-                { text: 'Cancel', onPress: () => null, style: 'cancel' },
-                { text: 'Yes', onPress: () => BackHandler.exitApp() }
-            ]);
-            return true;
-        };
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', BackHandler.exitApp);
         return () => backHandler.remove();
     }, []);
 

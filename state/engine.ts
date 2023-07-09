@@ -56,31 +56,6 @@ function getBestMoveLookingOneMoveAhead(boardSize: number, squares: (number | nu
     return opponentWinningSquare !== undefined ? opponentWinningSquare : getRandomMove();
 }
 
-// export function getBestMoveLookingOneMoveAhead(): number {
-//     const { squares, boardSize, moves } = useGameStore.getState();
-//     const playerToMove = moves.length & 1 ? PlayerId.Two : PlayerId.One;
-// if (boardSize === 3) {
-//     if (moves.length === 1) {
-//         // select the center square if it's available
-//         if (squares[4] === null) {
-//             return 4;
-//         } else {
-//             // randomly select any of the 4 corner squares
-//             const cornerIndices = [0, 2, 6, 8];
-//             for (let i of shuffle(cornerIndices)) {
-//                 if (squares[i] === null) {
-//                     return i;
-//                 }
-//             }
-//         }
-//     } else {
-//         return simpleAlgo(boardSize, squares, playerToMove);
-//     }
-// } else {
-// return simpleAlgo(boardSize, squares, playerToMove);
-// }
-// }
-
 export function calculateNextMove(): number {
     const { squares, boardSize, moves, difficulty } = useGameStore.getState();
     const playerToMove = moves.length & 1 ? PlayerId.Two : PlayerId.One;
@@ -90,7 +65,8 @@ export function calculateNextMove(): number {
         case Difficulty.Medium:
             return getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
         case Difficulty.Difficult:
-            return boardSize === 3
+            const numberOfMovesRemaining = boardSize ** 2 - moves.length;
+            return boardSize === 3 || numberOfMovesRemaining < 9
                 ? getOptimalMove()
                 : getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
     }

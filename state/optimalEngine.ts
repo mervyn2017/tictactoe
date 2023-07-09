@@ -2,14 +2,36 @@ import { useGameStore } from './game';
 import { getWinningCombinations } from './checkForWinner';
 import { PlayerId } from './constants';
 
+// Find all the possible winning combinations involving each square on the board
+function createMapOfWinningCombosForEachSquare(boardSize) {
+    const numberSquares = boardSize ** 2;
+    const map = [];
+
+    const winningCombos = getWinningCombinations(boardSize);
+    for (let i = 0; i < numberSquares; ++i) {
+        const combos = [];
+        map.push(combos);
+        for (const combo of winningCombos) {
+            if (combo.some(squareIndex => squareIndex === i)) {
+                combos.push(combo);
+            }
+        }
+    }
+    return map;
+}
+
 const constants = {
     3: {
         numSquares: 3 ** 2,
-        winningCombos: getWinningCombinations(3)
+        winningComboMap: createMapOfWinningCombosForEachSquare(3)
     },
     4: {
         numSquares: 4 ** 2,
-        winningCombos: getWinningCombinations(4)
+        winningComboMap: createMapOfWinningCombosForEachSquare(4)
+    },
+    5: {
+        numSquares: 5 ** 2,
+        winningComboMap: createMapOfWinningCombosForEachSquare(5)
     }
 };
 
@@ -24,7 +46,7 @@ type Result = {
     outcome: Outcome;
 };
 
-function hasWinner(boardSize: number, winningCombos, squares: (PlayerId | null)[]): boolean {
+function playerWins(boardSize: number, winningCombos, squares: (PlayerId | null)[]): boolean {
     for (const combo of winningCombos) {
         const playerId = squares[combo[0]];
         if (playerId !== null) {
@@ -41,7 +63,7 @@ function hasWinner(boardSize: number, winningCombos, squares: (PlayerId | null)[
 }
 
 function calcBestMove(boardSize: number, playerId: PlayerId, squares: (PlayerId | null)[], numMoves: number): Result {
-    const { numSquares, winningCombos } = constants[boardSize];
+    const { numSquares, winningComboMap } = constants[boardSize];
     const playerToMove = numMoves & 1 ? PlayerId.Two : PlayerId.One;
     if (numMoves === numSquares) {
         return { outcome: Outcome.DRAW };
@@ -51,7 +73,7 @@ function calcBestMove(boardSize: number, playerId: PlayerId, squares: (PlayerId 
     for (let i = 0; i < numSquares; ++i) {
         if (squares[i] === null) {
             squares[i] = playerToMove;
-            if (hasWinner(boardSize, winningCombos, squares)) {
+            if (playerWins(boardSize, winningComboMap[i], squares)) {
                 squares[i] = null;
                 return { move: i, outcome: Outcome.WIN };
             }
@@ -76,13 +98,8 @@ function calcBestMove(boardSize: number, playerId: PlayerId, squares: (PlayerId 
 
 export function getOptimalMove(): number {
     const { squares, boardSize, moves } = useGameStore.getState();
-    if (moves.length === boardSize ** 2) {
-        throw new Error('Game is already over!');
-    }
     const numMoves = moves.length;
     const playerToMove = numMoves & 1 ? PlayerId.Two : PlayerId.One;
     const result = calcBestMove(boardSize, playerToMove, squares.slice(), numMoves);
     return result.move;
 }
-
-// 0 - 4 - 8 - 7 - 1 - 2 - 6 - 5 - 3
