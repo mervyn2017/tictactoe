@@ -1,6 +1,5 @@
 import { useGameStore, Difficulty } from './game';
 import { getWinningCombinations } from './checkForWinner';
-import { shuffle } from '../utils/statistics';
 import { PlayerId } from './constants';
 import { getOptimalMove } from './optimalEngine';
 
@@ -20,10 +19,16 @@ function getRandomMove(): number {
     return nullSquares[r];
 }
 
-// A simple algorithm that blocks a winning combination from the other player and picks
-// a winning square when possible. Priority is given to a winning combo over blocking
-// a losing combo when both are available.
-function getBestMoveLookingOneMoveAhead(boardSize: number, squares: (number | null)[], playerToMove: PlayerId) {
+/**
+ * Return an immediate winning move if available
+ * else return a move that blocks an immediate win by the other player if they have one
+ * else return a random move
+ * @param boardSize
+ * @param playerToMove
+ * @param squares
+ * @returns
+ */
+function getBestMoveLookingOneMoveAhead(boardSize: number, playerToMove: PlayerId, squares: (number | null)[]) {
     const winningCombos = getWinningCombinations(boardSize);
     // look for any combination which has (boardSize-1) of the same player
     const opposingPlayer = playerToMove === PlayerId.One ? PlayerId.Two : PlayerId.One;
@@ -63,11 +68,11 @@ export function calculateNextMove(): number {
         case Difficulty.Easy:
             return getRandomMove();
         case Difficulty.Medium:
-            return getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
+            return getBestMoveLookingOneMoveAhead(boardSize, playerToMove, squares);
         case Difficulty.Difficult:
             const numberOfMovesRemaining = boardSize ** 2 - moves.length;
-            return boardSize === 3 || numberOfMovesRemaining < 9
+            return boardSize === 3 || numberOfMovesRemaining < 10
                 ? getOptimalMove()
-                : getBestMoveLookingOneMoveAhead(boardSize, squares, playerToMove);
+                : getBestMoveLookingOneMoveAhead(boardSize, playerToMove, squares);
     }
 }
