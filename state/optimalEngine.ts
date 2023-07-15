@@ -21,11 +21,10 @@ function createMapOfWinningCombosForEachSquare(boardSize) {
     return map;
 }
 
-const winningCombosMap = {
-    3: createMapOfWinningCombosForEachSquare(3),
-    4: createMapOfWinningCombosForEachSquare(4),
-    5: createMapOfWinningCombosForEachSquare(5)
-};
+const winningCombosMap = new Map();
+for (let boardSize = 3; boardSize <= 5; ++boardSize) {
+    winningCombosMap.set(boardSize, createMapOfWinningCombosForEachSquare(boardSize));
+}
 
 enum Outcome {
     WIN = 1,
@@ -90,7 +89,7 @@ function calcBestMove(
 export function getOptimalMove(): number {
     const { squares, boardSize, moves } = useGameStore.getState();
     const numSquares = boardSize ** 2;
-    const winningComboMap = winningCombosMap[boardSize];
+    const winningComboMap = winningCombosMap.get(boardSize);
     const numMoves = moves.length;
     const squaresTemp = squares.slice();
     const playerToMove = numMoves & 1 ? PlayerId.Two : PlayerId.One;
@@ -106,7 +105,7 @@ export function getOptimalMove(): number {
     let bestMove;
     for (let move of remainingMoves) {
         squaresTemp[move] = playerToMove;
-        if (playerWins(boardSize, winningComboMap[move], squares)) {
+        if (playerWins(boardSize, winningComboMap[move], squaresTemp)) {
             return move;
         }
         const outcome = calcBestMove(boardSize, numSquares, winningComboMap, squaresTemp, numMoves + 1);

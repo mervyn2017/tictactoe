@@ -71,7 +71,7 @@ export function calculateNextMove(): number {
             return getBestMoveLookingOneMoveAhead(boardSize, playerToMove, squares);
         case Difficulty.Difficult:
             const numberOfMovesRemaining = boardSize ** 2 - moves.length;
-            return boardSize === 3 || numberOfMovesRemaining < 10
+            return boardSize === 3 || numberOfMovesRemaining < 9
                 ? getOptimalMove()
                 : getBestMoveLookingOneMoveAhead(boardSize, playerToMove, squares);
     }
